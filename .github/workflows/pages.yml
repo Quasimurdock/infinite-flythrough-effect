@@ -23,8 +23,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Assemble the site: the demo keeps referencing ../src/, so mirror
-      # that relative shape inside the published root.
+      # Assemble the site: the demo lives at the site root and references
+      # ./src/ — flatten src/ next to it for both local and Pages layouts.
       - name: Assemble site
         run: |
           mkdir -p _site/src

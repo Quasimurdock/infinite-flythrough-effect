@@ -9,9 +9,8 @@
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Jost:wght@300;400;500&display=swap"
 />
-<link rel="stylesheet" href="../src/styles.css" />
 <style>
-  /* demo-page chrome only — the engine styles live in infinite-flythrough.css */
+  /* demo-page chrome only — the engine styles live in styles.css */
   html, body { height: 100%; margin: 0; background: #0a0906; }
   #app { position: fixed; inset: 0; }
 </style>
@@ -19,9 +18,13 @@
 <body>
   <div id="app"></div>
 
-  <!-- Framework-agnostic engine. The inline bootstrap tries the ES Module
-       first (http servers / bundlers) and transparently falls back to the
-       UMD build so the demo also works double-clicked from file://. -->
+  <!--
+    Framework-agnostic engine. This bootstrap resolves the engine from a
+    list of candidate locations so the same file works:
+      • GitHub Pages  (site root: ./src/)
+      • repo checkout over http (examples/: ../src/)
+      • double-clicked from file:// (UMD fallback)
+  -->
   <script>
     window.__FT_OPTS = {
       container: null, // filled below
@@ -56,28 +59,48 @@
     })();
   </script>
   <script type="module">
-    import { createFlythrough } from '../src/infinite-flythrough.js';
-    window.__FT_OPTS.container = document.getElementById('app');
-    window.__FT_OPTS.items = window.__FT_ITEMS;
-    window.ft = createFlythrough(window.__FT_OPTS);
-  </script>
-  <script>
-    // UMD fallback: if the module path failed (file:// CORS), load it classically
-    window.addEventListener('error', e => {
-      if (!window.ft && !window.__ftFallbackTried &&
-          /infinite-flythrough\.esm\.js/.test(e.target && e.target.src || '')){
-        window.__ftFallbackTried = true;
-        const s = document.createElement('script');
-        s.src = './infinite-flythrough.umd.js';
-        s.onload = () => {
+    // ---- resolve engine location --------------------------------------
+    // Candidates are tried in order; the first that loads wins. Each module
+    // candidate also injects its matching stylesheet before importing.
+    const ENGINE_PATHS = ['./src/infinite-flythrough.js', '../src/infinite-flythrough.js'];
+    const CSS_PATHS    = ['./src/styles.css',            '../src/styles.css'];
+
+    function loadCss(href){
+      return new Promise((ok, err) => {
+        const l = document.createElement('link');
+        l.rel = 'stylesheet'; l.href = href;
+        l.onload = () => ok(href); l.onerror = () => err(new Error(href));
+        document.head.appendChild(l);
+      });
+    }
+    async function boot(){
+      for (let i = 0; i < ENGINE_PATHS.length; i++){
+        try {
+          await loadCss(CSS_PATHS[i]);
+          const mod = await import(ENGINE_PATHS[i]);
           window.__FT_OPTS.container = document.getElementById('app');
           window.__FT_OPTS.items = window.__FT_ITEMS;
-          window.ft = window.InfiniteFlythrough.createFlythrough(window.__FT_OPTS);
-        };
-        document.head.appendChild(s);
+          window.ft = mod.createFlythrough(window.__FT_OPTS);
+          return;                                   // engine is live
+        } catch (e) { /* try next candidate */ }
       }
-    }, true);
+      // ESM exhausted → UMD fallback (works from file://)
+      try {
+        await loadCss(CSS_PATHS[CSS_PATHS.length - 1]);
+        await new Promise((ok, err) => {
+          const s = document.createElement('script');
+          s.src = './infinite-flythrough.umd.js';
+          s.onload = ok; s.onerror = err;
+          document.head.appendChild(s);
+        });
+        window.__FT_OPTS.container = document.getElementById('app');
+        window.__FT_OPTS.items = window.__FT_ITEMS;
+        window.ft = window.InfiniteFlythrough.createFlythrough(window.__FT_OPTS);
+      } catch (e) {
+        console.error('[flythrough] could not load the engine from any candidate path', e);
+      }
+    }
+    boot();
   </script>
 </body>
 </html>
-

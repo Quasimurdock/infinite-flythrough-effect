@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Infinite Scroll Zoom — 无限滚动缩放</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0906'/%3E%3Cpath d='M8 20 L16 9 L24 20 Z' fill='none' stroke='%23d9a05b' stroke-width='2'/%3E%3Ccircle cx='16' cy='9' r='2.4' fill='%23d9a05b'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://picsum.photos" crossorigin />
 <link
   rel="stylesheet"
@@ -43,13 +44,15 @@
       onLaneChange: lane => console.log('[flythrough] lane →', lane),
     };
     window.__FT_ITEMS = (() => {
+      // Self-hosted assets: no third-party image CDN dependency, so the demo
+      // renders even on networks that block external CDNs.
+      const IMG = id => `./assets/img${id}.jpg`;
       const IMAGES = [
         ['Dunes', 1015], ['Night Fields', 1016], ['Summit', 1018],
         ['Harbor', 1036], ['Lane', 1043], ['Wild', 1050],
         ['Stone', 1052], ['Vast', 1057], ['Glass', 1040],
         ['Gates', 1025], ['Peak', 1011], ['Meadow', 7],
-      ].map(([title, id]) => ({ title, type: 'img',
-        src: `https://picsum.photos/id/${id}/3200/4000` }));
+      ].map(([title, id]) => ({ title, type: 'img', src: IMG(id) }));
       const VIDEOS = [
         ['Drift',   'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4'],
         ['Storm',   'https://test-videos.co.uk/vids/sintel/mp4/h264/720/Sintel_720_10s_1MB.mp4'],

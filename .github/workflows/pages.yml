@@ -28,7 +28,7 @@ jobs:
       - name: Assemble site
         run: |
           mkdir -p _site/src
-          cp -r examples/* _site/
+          cp -r examples/* _site/  # includes ./assets images
           cp src/* _site/src/
 
       - name: Setup Pages
@@ -42,3 +42,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+

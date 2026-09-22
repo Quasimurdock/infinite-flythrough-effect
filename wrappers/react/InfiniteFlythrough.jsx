@@ -14,8 +14,8 @@
    />
    ===================================================================== */
 import { useEffect, useImperativeHandle, forwardRef, useMemo } from 'react';
-import { createFlythrough } from './infinite-flythrough.esm.js';
-import './infinite-flythrough.css';
+import { createFlythrough } from '../../src/infinite-flythrough.js';
+import '../../src/styles.css';
 
 export const InfiniteFlythrough = forwardRef(function InfiniteFlythrough(
   { items, motion = {}, style = {}, ui = {}, seed = 21,
@@ -88,3 +88,4 @@ export function useFlythroughApi(){
 }
 
 export default InfiniteFlythrough;
+

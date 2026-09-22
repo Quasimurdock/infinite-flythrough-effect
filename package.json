@@ -1,0 +1,44 @@
+{
+  "name": "infinite-flythrough-effect",
+  "version": "1.0.0",
+  "description": "Infinite scroll zoom effect — a real 3D camera flies through a lane-scattered cloud of image/video cards. Framework-agnostic core with Vue 3 / React 18 wrappers.",
+  "type": "module",
+  "main": "./src/infinite-flythrough.js",
+  "module": "./src/infinite-flythrough.js",
+  "exports": {
+    ".": "./src/infinite-flythrough.js",
+    "./styles.css": "./src/styles.css",
+    "./vue": "./wrappers/vue/InfiniteFlythrough.vue",
+    "./react": "./wrappers/react/InfiniteFlythrough.jsx"
+  },
+  "files": [
+    "src",
+    "wrappers",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build:umd": "node scripts/build.mjs",
+    "serve": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/serve.ps1"
+  },
+  "keywords": [
+    "infinite-scroll",
+    "zoom",
+    "3d",
+    "camera",
+    "parallax",
+    "css-3d",
+    "vue",
+    "react",
+    "gallery",
+    "flythrough"
+  ],
+  "author": {
+    "name": "Quasimurdock",
+    "email": "sh1wnt@outlook.com"
+  },
+  "license": "MIT",
+  "sideEffects": [
+    "*.css"
+  ]
+}

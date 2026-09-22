@@ -17,8 +17,8 @@
 </template>
 
 <script>
-import { createFlythrough } from './infinite-flythrough.esm.js';
-import './infinite-flythrough.css';
+import { createFlythrough } from '../../src/infinite-flythrough.js';
+import '../../src/styles.css';
 
 let uid = 0;
 
@@ -63,3 +63,4 @@ export default {
 <style>
 .ift-vue-host { position: relative; width: 100%; height: 100%; min-height: 420px; }
 </style>
+

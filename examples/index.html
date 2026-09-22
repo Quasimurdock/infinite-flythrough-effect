@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Infinite Scroll Zoom — 无限滚动缩放</title>
+<link rel="preconnect" href="https://picsum.photos" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Jost:wght@300;400;500&display=swap"
+/>
+<link rel="stylesheet" href="../src/styles.css" />
+<style>
+  /* demo-page chrome only — the engine styles live in infinite-flythrough.css */
+  html, body { height: 100%; margin: 0; background: #0a0906; }
+  #app { position: fixed; inset: 0; }
+</style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- Framework-agnostic engine. The inline bootstrap tries the ES Module
+       first (http servers / bundlers) and transparently falls back to the
+       UMD build so the demo also works double-clicked from file://. -->
+  <script>
+    window.__FT_OPTS = {
+      container: null, // filled below
+      items: null,     // filled below
+      ui: {
+        hud: true, controls: true, hint: true, progress: true,
+        eyebrow: 'A spatial scroll',
+        title: 'Continuous Horizons',
+        foot: 'scroll to fly · click a card to dive in',
+      },
+      motion: { inertia: 0.085, depthGap: 420, density: 24, lanes: 4,
+                laneSpread: 1.05, autoCruise: 1.6 },
+      style: { radius: 16, shadow: 60, panelW: 100 },
+      onFocus:  info => console.log('[flythrough] focus', info),
+      onRelease: info => console.log('[flythrough] release', info),
+      onLaneChange: lane => console.log('[flythrough] lane →', lane),
+    };
+    window.__FT_ITEMS = (() => {
+      const IMAGES = [
+        ['Dunes', 1015], ['Night Fields', 1016], ['Summit', 1018],
+        ['Harbor', 1036], ['Lane', 1043], ['Wild', 1050],
+        ['Stone', 1052], ['Vast', 1057], ['Glass', 1040],
+        ['Gates', 1025], ['Peak', 1011], ['Meadow', 7],
+      ].map(([title, id]) => ({ title, type: 'img',
+        src: `https://picsum.photos/id/${id}/3200/4000` }));
+      const VIDEOS = [
+        ['Drift',   'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4'],
+        ['Storm',   'https://test-videos.co.uk/vids/sintel/mp4/h264/720/Sintel_720_10s_1MB.mp4'],
+        ['Current', 'https://test-videos.co.uk/vids/jellyfish/mp4/h264/720/Jellyfish_720_10s_2MB.mp4'],
+      ].map(([title, src]) => ({ title, type: 'video', src }));
+      return IMAGES.flatMap((it, i) => (i % 4 === 2 ? [it, VIDEOS[(i / 4 | 0) % VIDEOS.length]] : [it]));
+    })();
+  </script>
+  <script type="module">
+    import { createFlythrough } from '../src/infinite-flythrough.js';
+    window.__FT_OPTS.container = document.getElementById('app');
+    window.__FT_OPTS.items = window.__FT_ITEMS;
+    window.ft = createFlythrough(window.__FT_OPTS);
+  </script>
+  <script>
+    // UMD fallback: if the module path failed (file:// CORS), load it classically
+    window.addEventListener('error', e => {
+      if (!window.ft && !window.__ftFallbackTried &&
+          /infinite-flythrough\.esm\.js/.test(e.target && e.target.src || '')){
+        window.__ftFallbackTried = true;
+        const s = document.createElement('script');
+        s.src = './infinite-flythrough.umd.js';
+        s.onload = () => {
+          window.__FT_OPTS.container = document.getElementById('app');
+          window.__FT_OPTS.items = window.__FT_ITEMS;
+          window.ft = window.InfiniteFlythrough.createFlythrough(window.__FT_OPTS);
+        };
+        document.head.appendChild(s);
+      }
+    }, true);
+  </script>
+</body>
+</html>
+
